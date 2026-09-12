@@ -1,36 +1,24 @@
-# Dependencies
-node_modules/
-
-# Build outputs
-build/
-dist/
-
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# TypeScript
-*.tsbuildinfo
-
 # Logs
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-*.log
+pnpm-debug.log*
+lerna-debug.log*
 
-# OS files
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-
-# Testing coverage
-coverage/
-
-# Vite specific (if you use Vite instead of CRA)
-.vite/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
