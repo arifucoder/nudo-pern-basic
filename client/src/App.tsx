@@ -101,6 +101,9 @@ function App() {
 		<>
 			<div className="max-w-4xl my-5 mx-auto">
 				{/* Add / Edit Form */}
+				<div>
+					<h1>Add Todos</h1>
+				</div>
 				<div className="flex gap-2 mb-4">
 					<input
 						type="text"

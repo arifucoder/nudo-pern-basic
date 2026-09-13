@@ -1,0 +1,55 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ---------- CI: runs on every push and PR ----------
+  # Purpose: catch broken code BEFORE it reaches main / the server.
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install & build server
+        working-directory: server
+        run: |
+          npm ci
+          npx prisma generate
+          npm run build
+
+      - name: Install, lint & build client
+        working-directory: client
+        run: |
+          npm ci
+          npm run lint
+          npm run build
+
+  # ---------- CD: only runs on push to main, only after CI passes ----------
+  # Purpose: SSH into the VPS and do exactly what you were doing by hand:
+  # git pull -> docker compose build -> restart -> run migrations.
+  deploy:
+    needs: build-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            cd ~/nudo-pern-basic
+            git pull origin main
+            docker compose up --build -d
+            docker compose exec -T server npx prisma migrate deploy
